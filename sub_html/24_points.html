@@ -1,0 +1,29 @@
+<html>
+
+<style>
+    body{text-align: center;}
+</style>
+
+<head>
+    <title>Traditional Games Solvers</title>
+</head>
+
+<body>
+    <h2>24 points</h2>
+    <p>Fill in the following four blanks with four integers or finite decimals. Fractions are not allowed.</p>
+    <form>        
+        <input type="text" id="first">
+        <input type="text" id="second">
+        <input type="text" id="third">
+        <input type="text" id="fourth">
+    </form>
+    <p>Also,you can change your target number beneath, which at default is 24.</p>
+    <form>
+        <input type="text" id="target" value="24">
+    </form>
+    <script src="../script/24points.js"></script>
+    <button onclick="calculate_result()">SUBMIT</button>
+    <p>The answer:</p>
+    <p id = "answer"></p>
+</body>
+</html>
