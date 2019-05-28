@@ -77,7 +77,7 @@ function analysis_back(x, m, n, initial, first_round, second_round, first_round_
         third_line =
             String(second_round[m][numbers3[z][0]])
             + symbols[y] + String(second_round[m][numbers3[z][1]])
-            + "="+ target;
+            + "=" + target;
     }
     else {
         third_line =
@@ -85,12 +85,14 @@ function analysis_back(x, m, n, initial, first_round, second_round, first_round_
             + "/" + String(second_round[m][numbers3[z][0]])
             + "=" + target;
     }
-    let complete_string = inistr + " can have a result of " + target + "." + "<br/>" + first_line + "<br/>" + second_line + "<br/>" + third_line;
+    let complete_string = inistr + " can have a result of " + target + "." + "<br/>" + first_line + "<br/>" + second_line + "<br/>" + third_line + "<br/>" + "<br/>";
     return complete_string;
 }
 
 function calculate_result() {
-    let bool;
+    let count = 0;
+    let bool_stop;
+    let result_all = "";
     let initial = new Array();
     let input = document.getElementById("first").value;
     let inistr = "".concat(input);
@@ -105,6 +107,7 @@ function calculate_result() {
     inistr = inistr.concat("," + input);
     initial.push(Number(input));
     target = document.getElementById("target").value;
+    let oaArr = document.all('one_or_all');
     let first_round = plus_minus_multi_divide(initial);
     for (let x = 0; x < first_round.length; x++) {
         [...first_round_backup] = first_round[x]
@@ -114,14 +117,23 @@ function calculate_result() {
             let final = plus_minus_multi_divide(second_round[m]);
             for (let n = 0; n < final.length; n++) {
                 if (final[n][0] == Number(target)) {
-                    document.getElementById("answer").innerHTML=analysis_back(x, m, n, initial, first_round, second_round, first_round_backup, second_round_backup, inistr,target);
-                    bool = true;
-                    break;
+                    let result = analysis_back(x, m, n, initial, first_round, second_round, first_round_backup, second_round_backup, inistr, target);
+                    if (oaArr[0].checked) {
+                        document.getElementById("answer").innerHTML = result
+                        bool_stop = true;
+                        break;
+                    }
+                    else {
+                        count = count + 1;
+                        result_all = result_all.concat(result);
+                    }
+
                 }
             }
-            if (bool) { break };
+            if (bool_stop) { break };
         }
-        if (bool) { break };
+        if (bool_stop) { break };
     }
-    if (!bool) { document.getElementById("answer").innerHTML=inistr + "can never have a result of " + target + "."};
+    if (oaArr[0].checked && !bool_stop) { document.getElementById("answer").innerHTML = inistr + " can never have a result of " + target + "." }
+    else if (oaArr[1].checked) { document.getElementById("answer").innerHTML = result_all + String(count) };
 }
