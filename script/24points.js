@@ -3,12 +3,12 @@ function sortNumber(a, b) {
 }
 
 function in_array(search, array) {
-    for (var i in array) {
+    for (let i in array) {
         if (array[i] == search) {
-            return true;
+            return i;
         }
     }
-    return false;
+    return -1;
 }
 
 function toString(array) {
@@ -24,6 +24,16 @@ function super_splice(reason, result, loc) {
     for (let i = 1; i < reason.length; i++) {
         result.splice(loc + i, 0, reason[i]);
     }
+}
+
+function substitute(result, first, second) {
+    let temp1 = result[first - 1];
+    let temp2 = result[first];
+    result[first - 1] = result[second - 1];
+    result[first] = result[second];
+    result[second - 1] = temp1;
+    result[second] = temp2;
+    return result;
 }
 
 function plus_minus_multi_divide(array) {
@@ -231,7 +241,7 @@ function sub_sequence(start, end, result) {
     number_array = number_array.sort(sortNumber);
     for (let i = 0; i < quantity / 2; i++) {
         for (let j = 1; j < quantity; j = j + 2) {
-            if (number_array[i] == result[start + j] && !(in_array(j, j_array))) {
+            if (number_array[i] == result[start + j] && in_array(j, j_array) == -1) {
                 new_sequence[2 * i] = result[start + j - 1];
                 new_sequence[2 * i + 1] = result[start + j];
                 j_array.push(j);
@@ -271,67 +281,42 @@ function sequence(result) {
             result[3] = result[1];
             result[1] = temp;
         }
-        return result;
     }
-    if (result.indexOf("(") != -1 && result.indexOf("[") == -1) {
+    else if (result.indexOf("(") != -1 && result.indexOf("[") == -1) {
         let t = result.indexOf("(");
         result.splice(t, 6, "(" + toString(sub_sequence(t + 1, t + 4, result)) + ")");
-        if(t != 1){
-        let temp1 = result[0];
-        let temp2 = result[1];
-        result[0] = result[t-1];
-        result[1] = result[t];
-        result[t-1] = temp1;
-        result[t] = temp2;
+        if (t != 1) {
+            result = substitute(result, 1, t);
         }
-        let new_ = new Array(result[0],result[1]);
-        new_ = new_.concat(sub_sequence(2,5,result));
-        return new_;
+        let new_ = new Array(result[0], result[1]);
+        new_ = new_.concat(sub_sequence(2, 5, result));
+        result = new_;
     }
-    if (result.indexOf("(") != -1 && result.indexOf("[") != -1) {
+    else if (result.indexOf("(") != -1 && result.indexOf("[") != -1) {
         let t = result.indexOf("(");
         let k = result.indexOf("[");
         result.splice(t, 6, "(" + toString(sub_sequence(t + 1, t + 4, result)) + ")");
         if (result[k + 2] > result[k + 4]) {
-            let temp1 = result[k + 3];
-            let temp2 = result[k + 4];
-            result[k + 3] = result[k + 1];
-            result[k + 4] = result[k + 2];
-            result[k + 1] = temp1;
-            result[k + 2] = temp2;
+            result = substitute(result, k + 2, k + 4);
         }
         let answer = "";
         for (let i = k; i < k + 6; i++) {
             answer = answer.concat(result[i]);
         }
-        result.splice(k,6,answer);
+        result.splice(k, 6, answer);
         if (result[1] > result[3]) {
-            let temp3 = result[2];
-            let temp4 = result[3];
-            result[2] = result[0];
-            result[3] = result[1];
-            result[0] = temp3;
-            result[1] = temp4;
+            result = substitute(result, 1, 3);
         }
-        return result;
-
     }
-    if (result.indexOf("(") == -1 && result.indexOf("[") != -1) {
+    else if (result.indexOf("(") == -1 && result.indexOf("[") != -1) {
         let k = result.indexOf("[");
         result.splice(k, 8, "[" + toString(sub_sequence(k + 1, k + 6, result)) + "]");
         if (result[1] > result[3]) {
-            let temp1 = result[2];
-            let temp2 = result[3];
-            result[2] = result[0];
-            result[3] = result[1];
-            result[0] = temp1;
-            result[1] = temp2;
+            result = substitute(result, 1, 3);
         }
-        return result;
     }
-    if (result.indexOf("(") == -1 && result.indexOf("[") == -1) {
+    else if (result.indexOf("(") == -1 && result.indexOf("[") == -1) {
         result = sub_sequence(0, 7, result);
-        return result;
     }
     return result;
 }
@@ -357,18 +342,18 @@ function format(result_all, target) {
 
 function delete_same(result_all) {
     let result_deleted = new Array();
-    result_all = result_all.sort();
+    result_all.sort();
     result_deleted.push(result_all[0]);
     for (let i = 1; i < result_all.length; i++) {
         if (result_all[i] != result_deleted[result_deleted.length - 1]) {
             result_deleted.push(result_all[i]);
         }
     }
-    return result_deleted
+    return result_deleted;
 }
 
 function calculate_result() {
-    let bool_stop;
+    let bool_success = false;
     let result_all = new Array();
     let initial = new Array();
     let input = document.getElementById("first").value;
@@ -379,8 +364,7 @@ function calculate_result() {
     initial.push(Number(input));
     input = document.getElementById("fourth").value;
     initial.push(Number(input));
-    target = document.getElementById("target").value;
-    let oaArr = document.all('one_or_all');
+    let target = document.getElementById("target").value;
     let first_round = plus_minus_multi_divide(initial);
     for (let k = 0; k < first_round.length; k++) {
         let second_round = plus_minus_multi_divide(first_round[k]);
@@ -390,27 +374,22 @@ function calculate_result() {
                 if (final[n][0] == Number(target)) {
                     let result = analysis_back(k, m, n, initial, first_round, second_round);
                     result = levelize(result);
-                    let result_string = "";
-                    for (let j = 0; j < result.length; j++) {
-                        result_string = result_string.concat(result[j]);
-                    }
-                    if (oaArr[0].checked) {
-                        document.getElementById("answer").innerHTML = String(initial) + " can have a result of " + target + "." + "<br>" + result_string + "=" + target;
-                        bool_stop = true;
-                        break;
-                    }
-                    else {
-                        result_all.push(result);
-                    }
+                    result_all.push(result);
+                    bool_success = true;
                 }
             }
-            if (bool_stop) { break };
         }
-        if (bool_stop) { break };
     }
-    if (oaArr[0].checked && !bool_stop) { document.getElementById("answer").innerHTML = String(initial) + " can never have a result of " + target + "." }
-    else if (oaArr[1].checked) {
+    if (!bool_success) { document.getElementById("answer").innerHTML = String(initial) + " can never have a result of " + target + "." }
+    else {
         let result_ultimate = delete_same(format(result_all, target));
         document.getElementById("answer").innerHTML = String(initial) + " can have a result of " + target + "." + result_ultimate;
     };
+}
+
+function cleanup() {
+    document.getElementById("first").value = "";
+    document.getElementById("second").value = "";
+    document.getElementById("third").value = "";
+    document.getElementById("fourth").value = "";
 }
