@@ -1,7 +1,9 @@
 <html>
 
 <style>
-    body{text-align: center;}
+    body {
+        text-align: center;
+    }
 </style>
 
 <head>
@@ -11,22 +13,23 @@
 <body>
     <h2>24 points</h2>
     <p>Fill in the following four blanks with four integers or finite decimals. Fractions are not allowed.</p>
-    <form>        
+    <p>All different solutions will show up at default. Besides the exactly identical solutions, solutions like
+        23+(2+4)/6 and 23+6/(2+4) are also considered as the same.</p>
+    <form>
         <input type="text" id="first">
         <input type="text" id="second">
         <input type="text" id="third">
         <input type="text" id="fourth">
     </form>
-    <p>You can choose below whether you want to show one answer or all the answers.</p>
-    <input type="radio" name = "one_or_all" value = "show_one" checked = "checked">show one answer
-    <input type="radio" name = "one_or_all" value = "show_all"> show all answers
     <p>Also,you can change your target number beneath, which at default is 24.</p>
     <form>
         <input type="text" id="target" value="24">
     </form>
     <script src="../script/24points.js"></script>
-    <button onclick="calculate_result()">SUBMIT</button>
+    <button onclick="calculate_result();">SUBMIT</button>
     <p>The answer:</p>
-    <p id = "answer"></p>
+    <p id="answer"></p>
+    <button onclick="cleanup();">CLEAR</button>
 </body>
+
 </html>
