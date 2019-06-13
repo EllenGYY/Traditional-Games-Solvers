@@ -1,8 +1,12 @@
 <html>
 
 <style>
-    body {
+    div {
         text-align: center;
+        width: 300px;
+        padding: 10px;
+        border: 5px solid gray;
+        margin: 0px;
     }
 </style>
 
@@ -11,24 +15,24 @@
 </head>
 
 <body>
-    <h2>24 points</h2>
-    <p>Fill in the following four blanks with four integers or finite decimals. Fractions are not allowed.</p>
-    <p>All different solutions will show up at default.</p>
-    <form>
-        <input type="text" id="first">
-        <input type="text" id="second">
-        <input type="text" id="third">
-        <input type="text" id="fourth">
-    </form>
-    <p>Also,you can change your target number beneath, which at default is 24.</p>
-    <form>
-        <input type="text" id="target" value="24">
-    </form>
-    <script src="../script/24points.js"></script>
-    <button onclick="calculate_result();">SUBMIT</button>
-    <p>The answer:</p>
-    <p id="answer"></p>
-    <button onclick="cleanup();">CLEAR</button>
+    <div>
+        <h2>24 points</h2>
+        <p>Fill in the following blank with four integers or finite decimals, seperated by commas. Fractions are
+            not allowed.(e.g. input: 1,2,3,4 )</p>
+        <p>All different solutions will show up at default.</p>
+        <form>
+            <input type="text" id="first">
+        </form>
+        <p>Also,you can change your target number beneath, which at default is 24.</p>
+        <form>
+            <input type="text" id="target" value="24">
+        </form>
+        <script src="../script/24points.js"></script>
+        <button onclick="calculate_result();">SUBMIT</button>
+        <p>The answer:</p>
+        <p id="answer"></p>
+        <button onclick="cleanup();">CLEAR</button>
+    </div>
 </body>
 
 </html>
