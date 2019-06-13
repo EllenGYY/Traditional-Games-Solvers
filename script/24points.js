@@ -277,9 +277,7 @@ function sequence(result) {
         result.splice(1, 6, "(" + toString(sub_sequence(2, 5, result)) + ")");
         result.splice(3, 6, "(" + toString(sub_sequence(4, 7, result)) + ")");
         if (result[1] > result[3]) {
-            let temp = result[3];
-            result[3] = result[1];
-            result[1] = temp;
+            substitute(result, 1, 3);
         }
     }
     else if (result.indexOf("(") != -1 && result.indexOf("[") == -1) {
@@ -321,8 +319,67 @@ function sequence(result) {
     return result;
 }
 
+function sub_beautiful(result_slice) {
+    while (true) {
+        if (result_slice[0] == "+" || result_slice[0] == "*") {
+            result_slice = result_slice.slice(1);
+            break;
+        } else {
+            if (result_slice[1] == "(") {
+                result_slice = (result_slice.slice(result_slice.indexOf(")") + 1)).concat(result_slice.slice(0, result_slice.indexOf(")") + 1));
+            }
+            else if (result_slice[1] == "[") {
+                result_slice = (result_slice.slice(result_slice.indexOf("]") + 1)).concat(result_slice.slice(0, result_slice.indexOf("]") + 1));
+            }
+            else {
+                for (let i = 1; i < 100; i++) {
+                    if (isNaN(Number(result_slice[i]))) {
+                        result_slice = (result_slice.slice(i)).concat(result_slice.slice(0, i));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return result_slice;
+}
+
+function make_it_beautiful(result) {
+    result = sub_beautiful(result);
+    if (result.indexOf("(") != -1) {
+        if (result[result.indexOf("(") + 1] == "+" || result[result.indexOf("(") + 1] == "*") {
+            result = (result.slice(0, result.indexOf("(") + 1)).concat(result.slice(result.indexOf("(") + 2));
+        }
+        else {
+            result = result.slice(0, result.indexOf("(") + 1) + sub_beautiful(result.slice(result.indexOf("(") + 1, result.indexOf(")"))) + result.slice(result.indexOf(")"));
+        }
+        if (result[result.indexOf(")") + 2] == "(") {
+            if (result[result.indexOf(")") + 3] == "+" || result[result.indexOf(")") + 3] == "*") {
+                result = (result.slice(0, result.indexOf(")") + 3)).concat(result.slice(result.indexOf(")") + 4));
+            }
+            else {
+                result = result.slice(0, result.indexOf(")") + 3) + sub_beautiful(result.slice(result.indexOf(")") + 3, -1)) + ")";
+            }
+        }
+    }
+    if (result.indexOf("[") != -1) {
+        if (result[result.indexOf("[") + 1] == "+" || result[result.indexOf("[") + 1] == "*") {
+            result = (result.slice(0, result.indexOf("[") + 1)).concat(result.slice(result.indexOf("[") + 2));
+        }
+        else {
+            result = result.slice(0, result.indexOf("[") + 1) + sub_beautiful(result.slice(result.indexOf("[") + 1, result.indexOf("]"))) + result.slice(result.indexOf("]"));
+        }
+        if (result.indexOf("(") == -1) {
+            result = (result.slice(0, result.indexOf("["))).concat("(" + result.slice(result.indexOf("[") + 1));
+            result = (result.slice(0, result.indexOf("]"))).concat(")" + result.slice(result.indexOf("]") + 1));
+        }
+    }
+    return result;
+}
+
 function format(result_all, target) {
     let most_outside_symbol;
+    let result_string;
     for (let i = 0; i < result_all.length; i++) {
         let result = result_all[i];
         if (result.indexOf("[") != 0) {
@@ -335,7 +392,9 @@ function format(result_all, target) {
             result.splice(0, 0, "*");
         } else { result.splice(0, 0, "+"); }
         result = sequence(result);
-        result_all[i] = "<br>" + toString(result) + "=" + target;
+        result_string = toString(result);
+        result_string = make_it_beautiful(result_string);
+        result_all[i] = "<br>" + result_string + "=" + target;
     }
     return result_all
 }
@@ -356,40 +415,45 @@ function calculate_result() {
     let bool_success = false;
     let result_all = new Array();
     let initial = new Array();
-    let input = document.getElementById("first").value;
-    initial.push(Number(input));
-    input = document.getElementById("second").value;
-    initial.push(Number(input));
-    input = document.getElementById("third").value;
-    initial.push(Number(input));
-    input = document.getElementById("fourth").value;
-    initial.push(Number(input));
-    let target = document.getElementById("target").value;
-    let first_round = plus_minus_multi_divide(initial);
-    for (let k = 0; k < first_round.length; k++) {
-        let second_round = plus_minus_multi_divide(first_round[k]);
-        for (let m = 0; m < second_round.length; m++) {
-            let final = plus_minus_multi_divide(second_round[m]);
-            for (let n = 0; n < final.length; n++) {
-                if (final[n][0] == Number(target)) {
-                    let result = analysis_back(k, m, n, initial, first_round, second_round);
-                    result = levelize(result);
-                    result_all.push(result);
-                    bool_success = true;
+    let inputall = document.getElementById("first").value;
+    let the_last_comma = 0;
+    for (let i = 0; i < inputall.length; i++) {
+        if (inputall[i] == ",") {
+            initial.push(Number(inputall.slice(the_last_comma, i)));
+            the_last_comma = i + 1;
+        }
+    }
+    initial.push(Number(inputall.slice(the_last_comma)));
+    if (isNaN(initial[0]) || isNaN(initial[1]) || isNaN(initial[2]) || isNaN(initial[3]) || !isNaN(initial[4])) {
+        alert("INVAILD INPUT! PLEASE REINPUT!")
+        cleanup();
+    }
+    else {
+        let target = document.getElementById("target").value;
+        let first_round = plus_minus_multi_divide(initial);
+        for (let k = 0; k < first_round.length; k++) {
+            let second_round = plus_minus_multi_divide(first_round[k]);
+            for (let m = 0; m < second_round.length; m++) {
+                let final = plus_minus_multi_divide(second_round[m]);
+                for (let n = 0; n < final.length; n++) {
+                    if (final[n][0] == Number(target)) {
+                        let result = analysis_back(k, m, n, initial, first_round, second_round);
+                        result = levelize(result);
+                        result_all.push(result);
+                        bool_success = true;
+                    }
                 }
             }
         }
+        if (!bool_success) { document.getElementById("answer").innerHTML = String(initial) + " can never have a result of " + target + "." }
+        else {
+            let result_ultimate = delete_same(format(result_all, target));
+            document.getElementById("answer").innerHTML = String(initial) + " can have a result of " + target + "." + result_ultimate + ".";
+        }
     }
-    if (!bool_success) { document.getElementById("answer").innerHTML = String(initial) + " can never have a result of " + target + "." }
-    else {
-        let result_ultimate = delete_same(format(result_all, target));
-        document.getElementById("answer").innerHTML = String(initial) + " can have a result of " + target + "." + result_ultimate;
-    };
 }
 
 function cleanup() {
     document.getElementById("first").value = "";
-    document.getElementById("second").value = "";
-    document.getElementById("third").value = "";
-    document.getElementById("fourth").value = "";
+    document.getElementById("answer").innerHTML = "";
 }
