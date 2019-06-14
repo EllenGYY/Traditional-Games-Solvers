@@ -424,12 +424,12 @@ function calculate_result() {
         }
     }
     initial.push(Number(inputall.slice(the_last_comma)));
-    if (isNaN(initial[0]) || isNaN(initial[1]) || isNaN(initial[2]) || isNaN(initial[3]) || !isNaN(initial[4])) {
+    let target = document.getElementById("target").value;
+    if (isNaN(initial[0]) || isNaN(initial[1]) || isNaN(initial[2]) || isNaN(initial[3]) || !isNaN(initial[4]) || isNaN(Number(target))) {
         alert("INVAILD INPUT! PLEASE REINPUT!")
         cleanup();
     }
     else {
-        let target = document.getElementById("target").value;
         let first_round = plus_minus_multi_divide(initial);
         for (let k = 0; k < first_round.length; k++) {
             let second_round = plus_minus_multi_divide(first_round[k]);
@@ -455,5 +455,6 @@ function calculate_result() {
 
 function cleanup() {
     document.getElementById("first").value = "";
+    document.getElementById("target").value = "24";
     document.getElementById("answer").innerHTML = "";
 }
