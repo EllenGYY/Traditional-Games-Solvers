@@ -347,28 +347,13 @@ function sub_beautiful(result_slice) {
 function make_it_beautiful(result) {
     result = sub_beautiful(result);
     if (result.indexOf("(") != -1) {
-        if (result[result.indexOf("(") + 1] == "+" || result[result.indexOf("(") + 1] == "*") {
-            result = (result.slice(0, result.indexOf("(") + 1)).concat(result.slice(result.indexOf("(") + 2));
-        }
-        else {
-            result = result.slice(0, result.indexOf("(") + 1) + sub_beautiful(result.slice(result.indexOf("(") + 1, result.indexOf(")"))) + result.slice(result.indexOf(")"));
-        }
-        if (result[result.indexOf(")") + 2] == "(") {
-            if (result[result.indexOf(")") + 3] == "+" || result[result.indexOf(")") + 3] == "*") {
-                result = (result.slice(0, result.indexOf(")") + 3)).concat(result.slice(result.indexOf(")") + 4));
-            }
-            else {
-                result = result.slice(0, result.indexOf(")") + 3) + sub_beautiful(result.slice(result.indexOf(")") + 3, -1)) + ")";
-            }
-        }
+        result = result.slice(0, result.indexOf("(") + 1) + sub_beautiful(result.slice(result.indexOf("(") + 1, result.indexOf(")"))) + result.slice(result.indexOf(")"));
+    }
+    if (result[result.indexOf(")") + 2] == "(") {
+        result = result.slice(0, result.indexOf(")") + 3) + sub_beautiful(result.slice(result.indexOf(")") + 3, -1)) + ")";
     }
     if (result.indexOf("[") != -1) {
-        if (result[result.indexOf("[") + 1] == "+" || result[result.indexOf("[") + 1] == "*") {
-            result = (result.slice(0, result.indexOf("[") + 1)).concat(result.slice(result.indexOf("[") + 2));
-        }
-        else {
-            result = result.slice(0, result.indexOf("[") + 1) + sub_beautiful(result.slice(result.indexOf("[") + 1, result.indexOf("]"))) + result.slice(result.indexOf("]"));
-        }
+        result = result.slice(0, result.indexOf("[") + 1) + sub_beautiful(result.slice(result.indexOf("[") + 1, result.indexOf("]"))) + result.slice(result.indexOf("]"));
         if (result.indexOf("(") == -1) {
             result = (result.slice(0, result.indexOf("["))).concat("(" + result.slice(result.indexOf("[") + 1));
             result = (result.slice(0, result.indexOf("]"))).concat(")" + result.slice(result.indexOf("]") + 1));
