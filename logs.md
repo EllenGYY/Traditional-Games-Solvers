@@ -10,4 +10,4 @@
 
 can solve red part / cannot solve grey part
 
-![](https://i.pinimg.com/originals/62/34/9e/62349ede7e996fa6cf4aa208043e6e75.png)
+see screenshot in sodoku folder

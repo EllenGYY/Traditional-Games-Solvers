@@ -42,7 +42,7 @@ void check_before(int pos[]){
 		}
 	}
 	bool break_twice = false;
-	for (int m = pos[0] + 1; m < pos[0] - pos[0] % 3 + 3; m ++){
+	for (int m = pos[0] - pos[0] % 3; m < pos[0] - pos[0] % 3 + 3; m ++){
         for(int n = pos[1] - pos[1] % 3; n < pos[1] - pos[1] % 3 + 3; n ++){
             if(m != pos[0] && n != pos[1]){
                 if(initial_sodoku[m][n] == 0){
@@ -84,7 +84,7 @@ void related_left(int pos[]){
 			}
 		}
 	}
-    for (int m = pos[0] + 1; m < pos[0] - pos[0] % 3 + 3; m ++){
+    for (int m = pos[0] - pos[0] % 3; m < pos[0] - pos[0] % 3 + 3; m ++){
         for(int n = pos[1] - pos[1] % 3; n < pos[1] - pos[1] % 3 + 3; n ++){
             if(m != pos[0] && n != pos[1]){
                 if(initial_sodoku[m][n] != 0){
