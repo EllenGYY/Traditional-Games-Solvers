@@ -8,6 +8,6 @@
      ~~确定下一个传统游戏为华容道~~（BGM：己龍 - 朔宵）
 12.28 next traditional game is sodoku c++ first version
 
-can solve red part / cannot solve grey part
+can solve easy puzzle / see screenshot in sodoku folder
 
-see screenshot in sodoku folder
+12.29 can solve easy/medium/difficult puzzle see puzzle.txt

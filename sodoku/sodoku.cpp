@@ -6,9 +6,9 @@
 using namespace std;
 
 int initial_sodoku[9][9] = {
-		{1,0,7,6,0,0,0,0,9},{0,9,6,1,8,0,0,4,0},{0,0,5,0,7,0,0,6,0},
-		{0,0,0,0,0,0,5,0,4},{0,6,0,5,1,7,0,9,0},{7,0,8,0,0,0,0,0,0},
-		{0,7,0,0,4,0,8,0,0},{0,1,0,0,3,6,9,2,0},{3,0,0,0,0,2,4,0,6}
+		{0,7,0,2,0,0,0,8,0},{0,0,0,0,5,0,0,0,0},{0,0,3,6,0,0,0,0,2},
+		{0,0,0,0,0,0,6,0,9},{0,0,0,3,0,0,0,0,0},{3,0,7,0,0,6,0,0,0},
+		{5,0,0,0,0,4,7,0,0},{0,0,0,0,9,0,0,0,0},{0,3,0,0,0,1,0,9,0}
 	};
 map<int,vector<int> > record;
 
@@ -20,86 +20,146 @@ void del_impossi(int element, vector<int> *par){
     }
 }
 
-void check_before(int pos[]){
-	for(int i = 0; i < pos[0]; i ++){
-		if(initial_sodoku[i][pos[1]] == 0){
-			del_impossi(initial_sodoku[pos[0]][pos[1]], &record[i * 10 + pos[1]]);
-			if(record[i * 10 + pos[1]].size() == 1){
-				initial_sodoku[i][pos[1]] = record[i * 10 + pos[1]][0];
-				int next[2] = {i, pos[1]};
-				check_before(next);
-			}
+vector<int> find_related(int coor){
+	vector<int> related;
+	int y = coor % 10;
+	int x = (coor - y) / 10;
+	for(int i = 0; i < 9; i ++){
+		if(i != x){
+			related.push_back(10 * i + y);
+		}
+		if(i != y){
+			related.push_back(10 * x + i);
 		}
 	}
-	for(int i = 0; i < pos[1]; i ++){
-		if(initial_sodoku[pos[0]][i] == 0){
-			del_impossi(initial_sodoku[pos[0]][pos[1]], &record[pos[0] * 10 + i]);
-			if(record[pos[0] * 10 + i].size() == 1){
-				initial_sodoku[pos[0]][i] = record[pos[0] * 10 + i][0];
-				int next[2] = {pos[0], i};
-				check_before(next);
-			}
-		}
-	}
-	bool break_twice = false;
-	for (int m = pos[0] - pos[0] % 3; m < pos[0] - pos[0] % 3 + 3; m ++){
-        for(int n = pos[1] - pos[1] % 3; n < pos[1] - pos[1] % 3 + 3; n ++){
-            if(m != pos[0] && n != pos[1]){
-                if(initial_sodoku[m][n] == 0){
-                	map<int,vector<int> >::iterator it = record.find(m * 10 + n);
-   					if(it != record.end()){
-   						del_impossi(initial_sodoku[pos[0]][pos[1]], &record[m * 10 + n]);
-   						if(record[m * 10 + n].size() == 1){
-						initial_sodoku[m][n] = record[m * 10 + n][0];
-						int next[2] = {m, n};
-						check_before(next);
-	   					}else{
-	   						break_twice = true;
-	   						break;
-	   					}
-	   				}
-                }
+	for (int m = x - x % 3; m < x - x % 3 + 3; m ++){
+        for(int n = y - y % 3; n < y - y % 3 + 3; n ++){
+            if(m != x || n != y){
+            	related.push_back(10 * m + n);
             }
         }
-        if(break_twice){break;}
     }
+	return related;
 }
 
-void related_left(int pos[]){
+void check_before(int coor){
+	vector<int> related = find_related(coor);
+	for(vector<int>::iterator it = related.begin(); it != related.end(); it ++){
+		if(initial_sodoku[((*it) - (*it) % 10) / 10][(*it) % 10] == 0){
+			del_impossi(initial_sodoku[(coor - coor % 10) / 10][coor % 10], &record[*it]);
+			if(record[*it].size() == 1){
+				initial_sodoku[((*it) - (*it) % 10) / 10][(*it) % 10] = record[*it][0];
+				check_before(*it);
+			}
+		}
+	}
+}
+
+void possible_choice(int coor){
 	vector<int> possi;
+	vector<int> related = find_related(coor);
 	for(int i = 1; i < 10; i ++){
 		possi.push_back(i);
 	}
-	for(int i = 0; i < 9; i ++){
-		if(i != pos[0]){
-			if(initial_sodoku[i][pos[1]] != 0){
-				del_impossi(initial_sodoku[i][pos[1]], &possi);
-			}
+	for(vector<int>::iterator it = related.begin(); it != related.end(); it ++){
+		if(initial_sodoku[((*it) - (*it) % 10) / 10][(*it) % 10] != 0){
+			del_impossi(initial_sodoku[((*it) - (*it) % 10) / 10][(*it) % 10], &possi);
 		}
 	}
-	for(int i = 0; i < 9; i ++){
-		if(i != pos[1]){
-			if(initial_sodoku[pos[0]][i] != 0){
-				del_impossi(initial_sodoku[pos[0]][i], &possi);
-			}
-		}
-	}
-    for (int m = pos[0] - pos[0] % 3; m < pos[0] - pos[0] % 3 + 3; m ++){
-        for(int n = pos[1] - pos[1] % 3; n < pos[1] - pos[1] % 3 + 3; n ++){
-            if(m != pos[0] && n != pos[1]){
-                if(initial_sodoku[m][n] != 0){
-                    del_impossi(initial_sodoku[m][n], &possi);
-                }
-            }
-        }
-    }
     if(possi.size() == 1){
-    	initial_sodoku[pos[0]][pos[1]] = possi[0];
-    	check_before(pos);
+    	initial_sodoku[(coor - coor % 10) / 10][coor % 10] = possi[0];
+    	check_before(coor);
     }
     else{
-    	record[pos[0] * 10 + pos[1]] = possi;
+    	record[coor] = possi;
     }
+}
+
+void horizon_check_unique(int coor){
+	int x = (coor - coor % 10) / 10;
+	map<int,vector<int> > record_times;
+	for(int i = 0; i < 9; i ++){
+		if(initial_sodoku[x][i] == 0){
+			for(vector<int>::iterator it = record[10 * x + i].begin(); it != record[10 * x + i].end(); it ++){
+				if(record_times.find(*it) == record_times.end()){
+					vector<int> temp;
+					temp.push_back(10 * x + i);
+					record_times[*it] = temp;
+				}
+				else{
+					record_times[*it].push_back(10 * x + i);
+				}
+			}
+		}
+	}
+	for(map<int,vector<int> >::const_iterator it = record_times.begin(); it != record_times.end(); it ++){
+		if((it -> second).size() == 1){
+			int coor_t = (it -> second)[0];
+			initial_sodoku[(coor_t - coor_t % 10) / 10][coor_t % 10] = (it -> first);
+			check_before(coor_t);
+		}
+	}
+}
+
+void vertical_check_unique(int coor){
+	int y = coor % 10;
+	map<int,vector<int> > record_times;
+	for(int i = 0; i < 9; i ++){
+		if(initial_sodoku[i][y] == 0){
+			for(vector<int>::iterator it = record[10 * i + y].begin(); it != record[10 * i + y].end(); it ++){
+				if(record_times.find(*it) == record_times.end()){
+					vector<int> temp;
+					temp.push_back(10 * i + y);
+					record_times[*it] = temp;
+				}
+				else{
+					record_times[*it].push_back(10 * i + y);
+				}
+			}
+		}
+	}
+	for(map<int,vector<int> >::const_iterator it = record_times.begin(); it != record_times.end(); it ++){
+		if((it -> second).size() == 1){
+			int coor_t = (it -> second)[0];
+			initial_sodoku[(coor_t - coor_t % 10) / 10][coor_t % 10] = (it -> first);
+			check_before(coor_t);
+		}
+	}
+}
+
+void grid_check_unique(int coor){
+	int y = coor % 10;
+	int x = (coor - y) / 10;
+	map<int,vector<int> > record_times;
+	for (int m = x - x % 3; m < x - x % 3 + 3; m ++){
+        for(int n = y - y % 3; n < y - y % 3 + 3; n ++){
+            if(initial_sodoku[m][n] == 0){
+            	for(vector<int>::iterator it = record[10 * m + n].begin(); it != record[10 * m + n].end(); it ++){
+					if(record_times.find(*it) == record_times.end()){
+						vector<int> temp;
+						temp.push_back(10 * m + n);
+						record_times[*it] = temp;
+					}
+					else{
+						record_times[*it].push_back(10 * m + n);
+					}
+				}
+            }
+        }
+        for(map<int,vector<int> >::const_iterator it = record_times.begin(); it != record_times.end(); it ++){
+			if((it -> second).size() == 1){
+				int coor_t = (it -> second)[0];
+				initial_sodoku[(coor_t - coor_t % 10) / 10][coor_t % 10] = (it -> first);
+				check_before(coor_t);
+			}
+		}
+    }
+}
+
+void check_unique(int coor){
+	horizon_check_unique(coor);
+	vertical_check_unique(coor);
+	grid_check_unique(coor);
 }
 
 int main()
@@ -107,14 +167,32 @@ int main()
 	for(int i = 0; i < 9; i ++){
 		for(int j = 0; j < 9; j ++){
 			if(initial_sodoku[i][j] == 0){
-				int coor[2] = {i, j};
-				related_left(coor);
+				possible_choice(10 * i + j);
 			}
+		}
+	}
+	for(int i = 0; i <= 88; i += 11){
+		horizon_check_unique(i);
+		vertical_check_unique(i);
+	}
+	for(int i = 0; i <= 60; i += 30){
+		for(int j = 0; j <= 6; j += 3){
+			grid_check_unique(i + j);
 		}
 	}
 	for (int i = 0; i < 9; i ++){
 		for( int j = 0; j < 9; j ++){
 			cout << initial_sodoku[i][j] << ", ";
 		}
+		cout << "\n";
+	}
+	for(map<int,vector<int> >::const_iterator it = record.begin(); it != record.end(); it ++)
+	{
+	    cout << it -> first << " ";
+	    vector<int> temp = it -> second;
+	    for (vector<int>::const_iterator i = temp.begin(); i != temp.end(); i ++){
+    		cout << *i << " ";
+	    }
+	    cout << "\n";
 	}
 }
